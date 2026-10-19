@@ -35,7 +35,12 @@ def start_grpc_server():
         return True
     SONATA_GRPC_SERVER_PORT = find_free_port()
     grpc_server_exe = os.path.join(BIN_DIRECTORY, "sonata-grpc.exe")
-    nvda_espeak_dir = os.path.join(globalVars.appDir, "synthDrivers")
+    # Prefer the espeak-ng-data bundled with the addon (includes the Tetun `tdt`
+    # voice); fall back to the copy shipped with NVDA.
+    if os.path.isdir(os.path.join(BIN_DIRECTORY, "espeak-ng-data")):
+        nvda_espeak_dir = BIN_DIRECTORY
+    else:
+        nvda_espeak_dir = os.path.join(globalVars.appDir, "synthDrivers")
     env = os.environ.copy()
     env.update({
         "SONATA_GRPC_SERVER_PORT": str(SONATA_GRPC_SERVER_PORT),

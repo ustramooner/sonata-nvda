@@ -17,7 +17,26 @@ _DIR = os.path.abspath(os.path.dirname(__file__))
 _PIPER_SYNTH_DIR = os.path.join(_DIR, "synthDrivers", "sonata_neural_voices")
 LIB_DIR = os.path.join(_PIPER_SYNTH_DIR, "lib")
 BIN_DIR = os.path.join(_PIPER_SYNTH_DIR, "bin")
-del _DIR, _PIPER_SYNTH_DIR
+del _DIR
+
+
+def onInstall():
+    """Copy voices bundled with the addon into the Sonata voices directory."""
+    import globalVars
+
+    bundled = os.path.join(_PIPER_SYNTH_DIR, "bundled_voices")
+    if not os.path.isdir(bundled):
+        return
+    voices_dir = os.path.join(
+        globalVars.appArgs.configPath, "sonata", "voices", "piper"
+    )
+    os.makedirs(voices_dir, exist_ok=True)
+    for name in os.listdir(bundled):
+        src = os.path.join(bundled, name)
+        dst = os.path.join(voices_dir, name)
+        if os.path.isdir(src) and not os.path.exists(dst):
+            shutil.copytree(src, dst)
+            log.info(f"Installed bundled Sonata voice: {name}")
 
 
 def onUninstall():

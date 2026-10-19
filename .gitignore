@@ -9,3 +9,6 @@ manifest.ini
 *.nvda-addon
 .sconsign.dblite
 /[0-9]*.[0-9]*.[0-9]*.json
+addon/synthDrivers/sonata_neural_voices/bin/sonata-grpc.exe
+addon/synthDrivers/sonata_neural_voices/bin/espeak-ng-data/
+addon/synthDrivers/sonata_neural_voices/bundled_voices/
