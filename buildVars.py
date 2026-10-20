@@ -25,7 +25,7 @@ addon_info = {
 	# Translators: Long description to be shown for this add-on on add-on information from add-ons manager
 	"addon_description": _("""Neural voices for NVDA based on Sonata"""),
 	# version
-	"addon_version": "3.1.2",
+	"addon_version": "3.1.3",
 	# Author(s)
 	"addon_author": "Musharraf Omer <ibnomer2011@hotmail.com>",
 	# URL for the add-on documentation support
