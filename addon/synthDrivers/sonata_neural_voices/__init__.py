@@ -282,7 +282,7 @@ class SynthDriver(synthDriverHandler.SynthDriver):
                 else:
                     self.tts.language = item.lang
             elif item_type is RateCommand:
-                self.tts.rate = item.newValue
+                self.rate = item.newValue
             elif item_type is VolumeCommand:
                 self.tts.volume = item.newValue
             elif item_type is PitchCommand:
@@ -340,7 +340,7 @@ class SynthDriver(synthDriverHandler.SynthDriver):
                 else:
                     self.tts.language = item.lang
             elif item_type is RateCommand:
-                self.tts.rate = item.newValue
+                self.rate = item.newValue
             elif item_type is VolumeCommand:
                 self.tts.volume = item.newValue
             elif item_type is PitchCommand:

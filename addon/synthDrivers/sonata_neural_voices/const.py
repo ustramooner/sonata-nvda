@@ -30,6 +30,7 @@ SONATA_VOICES_DIR = os.path.join(
 )
 BATCH_SIZE = max(os.cpu_count() // 2, 2)
 FALLBACK_SPEAKER_NAME = "default"
-DEFAULT_RATE = 50
+# Server-side rate percent; 10 is the voice's natural speed (NVDA slider 25)
+DEFAULT_RATE = 10
 DEFAULT_VOLUME = 100
 DEFAULT_PITCH = 50
