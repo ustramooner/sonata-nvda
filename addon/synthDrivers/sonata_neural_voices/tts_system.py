@@ -17,6 +17,7 @@ from languageHandler import normalizeLanguage
 
 from . import aio
 from . import grpc_client
+from . import tetun_text
 from .const import *
 from .helpers import import_bundled_library, LIB_DIRECTORY
 
@@ -219,6 +220,8 @@ class SpeechOptions:
         return copy.copy(self)
 
     async def speak_text(self, text):
+        if self.voice.language.split("-")[0] == "tdt":
+            text = tetun_text.normalise(text)
         return self.voice.synthesize(
             text,
             self.rate,
