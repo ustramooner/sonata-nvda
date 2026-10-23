@@ -6,8 +6,8 @@ decimals and large amounts, which need the words rearranged. The forms below wer
   17:00        -> tuku 17                       (minutes of 00 are left out)
   10:30        -> tuku 10 liu minutu 30
   17/03/2022   -> loron 17, fulan 3, tinan 2022
-  1,35         -> 1 virgula 35                  (the decimals are read as a number: ida virgula tolunulu resin lima)
-  $1,35 biliaun -> dolar biliaun 1 virgula 35    (the scale word comes before the number)
+  1,35         -> 1, virgula 35                 (the decimals are read as a number: ida virgula tolunulu resin lima)
+  $1,35 biliaun -> dolar biliaun 1, virgula 35    (the scale word comes before the number)
 Only digits and a few words are produced; espeak-ng reads the numbers.
 """
 import re
@@ -45,7 +45,7 @@ def _decimal(m):
     decimals = m.group(2)
     zeros = " ".join("0" for _ in range(len(decimals) - len(decimals.lstrip("0"))))
     rest = decimals.lstrip("0")
-    parts = [m.group(1), "virgula"] + ([zeros] if zeros else []) + ([rest] if rest else [])
+    parts = [m.group(1) + ",", "virgula"] + ([zeros] if zeros else []) + ([rest] if rest else [])  # the comma gives the pause before "virgula" the expert asked for
     return " ".join(parts)
 
 
