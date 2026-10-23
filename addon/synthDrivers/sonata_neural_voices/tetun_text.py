@@ -5,7 +5,7 @@ espeak-ng reads plain numbers well (see docs/PHONEMES.md in the tetun-tts repo) 
 decimals and large amounts, which need the words rearranged. The forms below were given by a Tetun language expert (2026-10-22):
   17:00        -> tuku 17                       (minutes of 00 are left out)
   10:30        -> tuku 10 liu minutu 30
-  17/03/2022   -> loron 17, fulan 3, tinan 2022
+  17/03/2022   -> loron 17, fulan Marsu, tinan 2022
   1,35         -> 1, virgula 35                 (the decimals are read as a number: ida virgula tolunulu resin lima)
   $1,35 biliaun -> dolar biliaun 1, virgula 35    (the scale word comes before the number)
 Only digits and a few words are produced; espeak-ng reads the numbers.
@@ -28,11 +28,14 @@ def _scale(m):
     return ("dolar " if m.group("cur") else "") + scale + " " + m.group("num")
 
 
+_MONTHS = ("Janeiru", "Fevereiru", "Marsu", "Abríl", "Maiu", "Junhu", "Julhu", "Agostu", "Setembru", "Outubru", "Novembru", "Dezembru")
+
+
 def _date(m):
     day, month, year = int(m.group(1)), int(m.group(3)), m.group(4)
     if not (1 <= day <= 31 and 1 <= month <= 12):
         return m.group(0)
-    return f"loron {day}, fulan {month}, tinan {year}"
+    return f"loron {day}, fulan {_MONTHS[month - 1]}, tinan {year}"
 
 
 def _time(m):
