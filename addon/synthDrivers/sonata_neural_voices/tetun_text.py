@@ -8,6 +8,8 @@ decimals and large amounts, which need the words rearranged. The forms below wer
   17/03/2022   -> loron 17, fulan Marsu, tinan 2022
   1,35         -> 1, virgula 35                 (the decimals are read as a number: ida virgula tolunulu resin lima)
   $1,35 biliaun -> dolar biliaun 1, virgula 35    (the scale word comes before the number)
+  5mm          -> milímetru 5                   (units are written after the number but read before it; expert, 2026-10-27)
+  Dr. Silva    -> doutór Silva                  (titles and a few abbreviations are read in full)
 Only digits and a few words are produced; espeak-ng reads the numbers.
 """
 import re
@@ -20,6 +22,21 @@ _AMOUNT_SCALE = re.compile(
 )
 _DATE = re.compile(r"(?:\bloron\s+)?(?<![\d./-])(\d{1,2})([/.-])(\d{1,2})\2(\d{4})(?![\d/-])(?!\.\d)", re.IGNORECASE)
 _TIME = re.compile(r"(?:(?P<tuku>\btuku)\s+)?(?<![\d:])(?P<h>[01]?\d|2[0-3])(?::|h)(?P<m>[0-5]\d)(?![\d:])", re.IGNORECASE)
+# Units: the written form (case matters: GB is gigabait, but gb is not) and the Tetun word read before the number.
+_UNITS = {"mm": "milímetru", "cm": "sentímetru", "km": "kilómetru", "m": "metru", "kg": "kilograma", "mg": "miligrama", "g": "grama",
+          "ml": "mililitru", "l": "litru", "t": "tonelada", "ton": "tonelada", "GB": "gigabait", "MB": "megabait", "KB": "kilobait",
+          "GHz": "gigahertz", "Hz": "hertz"}
+_UNIT = re.compile(r"(?<![\w.,])(?P<num>\d+(?:[.,]\d+)?)\s?(?P<unit>" + "|".join(sorted(_UNITS, key=len, reverse=True)) + r")\b(?![.,]?\d)")
+_WORDS = (
+    (re.compile(r"\bno\s+sst\b\.?", re.IGNORECASE), "ho selu-seluk tan"),
+    (re.compile(r"\bsst\.", re.IGNORECASE), "ho selu-seluk tan"),
+    (re.compile(r"\bDra\.(?=\s)"), "doutóra"),
+    (re.compile(r"\bDr\.(?=\s)"), "doutór"),
+    (re.compile(r"\bSra\.(?=\s)"), "senhora"),
+    (re.compile(r"\bSr\.(?=\s)"), "senhór"),
+    (re.compile(r"\bPr(?=\s+[A-Z])"), "padre"),
+    (re.compile(r"\b(?:no|nu)\.(?=\s?\d)", re.IGNORECASE), "númeru"),
+)
 _DECIMAL = re.compile(r"(?<![\d.,])(\d+),(\d{1,2})(?![\d])")
 
 
@@ -53,6 +70,9 @@ def _decimal(m):
 
 
 def normalise(text: str) -> str:
+    for pattern, word in _WORDS:
+        text = pattern.sub(word, text)
+    text = _UNIT.sub(lambda m: _UNITS[m.group("unit")] + " " + m.group("num"), text)
     text = _AMOUNT_SCALE.sub(_scale, text)
     text = _DATE.sub(_date, text)
     text = _TIME.sub(_time, text)
