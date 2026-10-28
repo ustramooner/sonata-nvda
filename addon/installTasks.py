@@ -20,8 +20,33 @@ BIN_DIR = os.path.join(_PIPER_SYNTH_DIR, "bin")
 del _DIR
 
 
+def _same_model(src, dst):
+    """True when the voice in dst has the same model file as the bundled one (size first, then SHA-256)."""
+    import hashlib
+
+    for name in os.listdir(src):
+        if not name.endswith(".onnx"):
+            continue
+        a, b = os.path.join(src, name), os.path.join(dst, name)
+        if not os.path.isfile(b) or os.path.getsize(a) != os.path.getsize(b):
+            return False
+        digests = []
+        for path in (a, b):
+            h = hashlib.sha256()
+            with open(path, "rb") as f:
+                for block in iter(lambda: f.read(1 << 20), b""):
+                    h.update(block)
+            digests.append(h.digest())
+        if digests[0] != digests[1]:
+            return False
+    return True
+
+
 def onInstall():
-    """Copy voices bundled with the addon into the Sonata voices directory."""
+    """Copy voices bundled with the addon into the Sonata voices directory.
+
+    A bundled voice replaces an installed voice of the same name when the model differs, so a new add-on release brings its new voice
+    (uninstalling the add-on does not remove the voices folder, and the first versions never replaced an existing voice)."""
     import globalVars
 
     bundled = os.path.join(_PIPER_SYNTH_DIR, "bundled_voices")
@@ -34,9 +59,15 @@ def onInstall():
     for name in os.listdir(bundled):
         src = os.path.join(bundled, name)
         dst = os.path.join(voices_dir, name)
-        if os.path.isdir(src) and not os.path.exists(dst):
-            shutil.copytree(src, dst)
-            log.info(f"Installed bundled Sonata voice: {name}")
+        if not os.path.isdir(src):
+            continue
+        if os.path.exists(dst):
+            if _same_model(src, dst):
+                continue
+            shutil.rmtree(dst)
+            log.info(f"Replacing installed Sonata voice with the bundled one: {name}")
+        shutil.copytree(src, dst)
+        log.info(f"Installed bundled Sonata voice: {name}")
 
 
 def onUninstall():
