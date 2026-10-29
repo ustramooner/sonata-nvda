@@ -34,7 +34,6 @@ _WORDS = (
     (re.compile(r"\bDr\.(?=\s)"), "doutór"),
     (re.compile(r"\bSra\.(?=\s)"), "senhora"),
     (re.compile(r"\bSr\.(?=\s)"), "senhór"),
-    (re.compile(r"\bPr(?=\s+[A-Z])"), "padre"),
     (re.compile(r"\b(?:no|nu)\.(?=\s?\d)", re.IGNORECASE), "númeru"),
 )
 _DECIMAL = re.compile(r"(?<![\d.,])(\d+),(\d{1,2})(?![\d])")
