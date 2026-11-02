@@ -44,7 +44,8 @@ from .tts_system import (
     SonataTextToSpeechSystem,
     SpeakerNotFoundError,
     SpeechOptions,
-)    
+    VoiceNotFoundError,
+)
 
 import addonHandler
 
@@ -280,7 +281,7 @@ class SynthDriver(synthDriverHandler.SynthDriver):
                 if item.isDefault:
                     self.tts.language = default_lang
                 else:
-                    self.tts.language = item.lang
+                    self._switch_language(item.lang)
             elif item_type is RateCommand:
                 self.rate = item.newValue
             elif item_type is VolumeCommand:
@@ -338,7 +339,7 @@ class SynthDriver(synthDriverHandler.SynthDriver):
                 if item.isDefault:
                     self.tts.language = default_lang
                 else:
-                    self.tts.language = item.lang
+                    self._switch_language(item.lang)
             elif item_type is RateCommand:
                 self.rate = item.newValue
             elif item_type is VolumeCommand:
@@ -362,6 +363,16 @@ class SynthDriver(synthDriverHandler.SynthDriver):
         self._current_task = process_speech(
             speech_seq
         ).result()
+
+    def _switch_language(self, lang):
+        """Follow NVDA's language change when an installed voice speaks that language; otherwise keep the current voice.
+
+        NVDA sends a LangChangeCommand for the language tagged in a document (for example en_AU in an Outlook message). Raising
+        for a language with no installed voice aborted the whole speak() call, so nothing was spoken (and Read all stopped)."""
+        try:
+            self.tts.language = lang
+        except VoiceNotFoundError:
+            log.debug(f"No Sonata voice for language {lang}; keeping the current voice")
 
     def cancel(self):
         if self._current_task is not None:
