@@ -105,12 +105,14 @@ def terminate():
 
 
 @aio.asyncio_coroutine_to_concurrent_future
-async def check_grpc_server(timeout=15) -> str:
+async def check_grpc_server(timeout=45) -> str:
     return await asyncio.wait_for(get_sonata_version(), timeout)
 
 
 async def get_sonata_version():
-    resp = await SONATA_GRPC_SERVICE.GetSonataVersion(msgs.Empty())
+    # The server was started moments ago (a slow first start after logon, antivirus scanning the exe): wait for it to listen
+    # instead of failing the call at once with UNAVAILABLE, which made NVDA report "Could not load the Sonata neural voices synthesiser".
+    resp = await SONATA_GRPC_SERVICE.GetSonataVersion(msgs.Empty(), wait_for_ready=True)
     return resp.version
 
 
